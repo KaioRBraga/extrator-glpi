@@ -1,0 +1,23 @@
+# segredos
+.env
+.env.*
+!.env.example
+certs/*.pem
+certs/*.crt
+certs/*.key
+deploy/certs/
+deploy/.env
+
+SDD/
+/SDD.docx
+
+# build
+/extrator
+/extrator.exe
+# dist e gerado pelo npm run build; o .gitkeep mantem o go:embed compilavel
+web/dist/*
+!web/dist/.gitkeep
+web/node_modules/
+web/*.tsbuildinfo
+deploy/*.tar.gz
+extratorglpi-deploy.tar.gz

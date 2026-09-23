@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-fundo: #262b33;
+  --color-painel: #2f353f;
+  --color-borda: #3d444f;
+  --color-acento: #f97316;
+  --color-acento-fraco: #5a3a1d;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-fundo);
+  color: #e5e7eb;
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* O icone do seletor de data do Chrome fica invisivel no tema escuro. */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+}

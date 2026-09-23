@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+certs
+extrator
+extrator.exe
+web/node_modules
+web/dist
+SDD

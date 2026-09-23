@@ -1,0 +1,28 @@
+services:
+  extrator:
+    image: extratorglpi:latest
+    container_name: extratorglpi
+    restart: unless-stopped
+    # Credenciais e URL do GLPI vivem so no .env deste diretorio.
+    env_file: .env
+    environment:
+      TZ: America/Sao_Paulo
+      SERVER_PORT: "8030"
+      TLS_CERT_FILE: /certs/server.crt
+      TLS_KEY_FILE: /certs/server.key
+    ports:
+      # 8443 ja esta ocupada neste host por outra aplicacao.
+      - "8030:8030"
+    volumes:
+      - ./certs:/certs:ro
+    healthcheck:
+      test: ["CMD", "/extrator", "-healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
