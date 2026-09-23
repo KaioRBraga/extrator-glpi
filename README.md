@@ -63,8 +63,7 @@ em produção, cerca de 95% vêm do formulário.
 **Motivo de encerramento.** Procurado em cascata: solução formal → último
 follow-up **público** → marcação explícita. Na prática **metade dos chamados é
 encerrada sem preencher a solução**, e o desfecho fica no follow-up
-("Normalizado.", "Acessos modificados, reinicie e teste"). É o "follow que
-entra na categoria de solução" descrito no SDD. Solução e follow-ups vêm
+("Normalizado.", "Acessos modificados, reinicie e teste"). Solução e follow-ups vêm
 embutidos na própria busca, sem uma requisição por chamado.
 
 Follow-ups **privados** ficam de fora de propósito: são notas internas da
