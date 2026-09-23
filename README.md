@@ -7,9 +7,18 @@ de solução, **motivo de abertura** e **motivo de encerramento**.
 Go no back-end, React + Tailwind no front, um binário único servido apenas em
 HTTPS, com as credenciais lidas exclusivamente do `.env`.
 
-![Tela do extrator](docs/tela.png)
+![Go](https://img.shields.io/badge/Go-1.24-00ADD8?logo=go&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Tailwind](https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-distroless-2496ED?logo=docker&logoColor=white)
+![Testes](https://img.shields.io/badge/testes-97%20casos-success)
+![TLS](https://img.shields.io/badge/HTTPS-obrigat%C3%B3rio-brightgreen)
+![GLPI](https://img.shields.io/badge/GLPI-API%20REST-orange)
+![Somente leitura](https://img.shields.io/badge/GLPI-somente%20leitura-lightgrey)
 
-<sub>Captura gerada com dados fictícios.</sub>
+![Demonstração do extrator](docs/demo.gif)
+
+<sub>Filtro por status, busca textual e exportação — gravado com dados fictícios.</sub>
 
 ---
 
@@ -61,12 +70,26 @@ embutidos na própria busca, sem uma requisição por chamado.
 Follow-ups **privados** ficam de fora de propósito: são notas internas da
 equipe e acabariam em um CSV que circula fora dela.
 
-| Situação | Coluna "Motivo de encerramento" | Origem |
-| --- | --- | --- |
-| Solução preenchida | texto da solução | `solucao` |
-| Sem solução, com follow-up público | texto do último follow-up | `followup` |
-| Ainda não encerrado | `Chamado em aberto` | `em aberto` |
-| Encerrado sem nenhum texto | `Encerrado sem descricao de solucao` | `sem registro` |
+```mermaid
+flowchart TD
+    A[Chamado] --> B{tem data de<br/>solução ou fechamento?}
+    B -->|não| C["<b>Chamado em aberto</b><br/><i>em aberto</i>"]
+    B -->|sim| D{solução formal<br/>preenchida?}
+    D -->|sim| E["texto da solução<br/><i>solucao</i>"]
+    D -->|não| F{tem follow-up<br/>público?}
+    F -->|sim| G["último follow-up<br/><i>followup</i>"]
+    F -->|não| H["<b>Encerrado sem descricao</b><br/><i>sem registro</i>"]
+
+    style C fill:#78350f,stroke:#f59e0b,color:#fef3c7
+    style E fill:#064e3b,stroke:#10b981,color:#d1fae5
+    style G fill:#064e3b,stroke:#10b981,color:#d1fae5
+    style H fill:#7f1d1d,stroke:#ef4444,color:#fee2e2
+```
+
+Distribuição real em um mês de produção (4.815 chamados): **48%** vieram da
+solução formal, **42%** do follow-up, 8% seguiam em aberto e 3% não tinham
+registro nenhum. Sem a etapa do follow-up, quase metade do relatório sairia
+sem motivo de encerramento.
 
 **Resolvido** é decidido pela data de solução ou fechamento, não pelo rótulo de
 status — assim o cálculo não quebra se o GLPI estiver em outro idioma.
@@ -78,6 +101,31 @@ outra pessoa.
 **Nomes e rótulos.** A busca devolve requerente, técnico e prioridade como IDs
 numéricos, mesmo com `expand_dropdowns`. O extrator traduz: prioridade por
 tabela e usuários por um cadastro carregado uma vez a cada 30 minutos.
+
+### O caminho de uma consulta
+
+```mermaid
+flowchart TB
+    U([Navegador]) -->|período, status, busca| A[API HTTP]
+    A --> C{período já<br/>está em cache?}
+    C -->|sim| M[Filtra status e busca<br/>em memória]
+    C -->|não| J[Recorta o período em<br/>janelas de 14 dias]
+    J --> G[(GLPI — janelas<br/>buscadas em paralelo)]
+    G --> D[Deduplica por ID e ordena]
+    D --> T[Traduz usuários e prioridades]
+    T --> S[(cache)]
+    S --> M
+    M --> R([Tabela, cards e CSV])
+
+    style U fill:#f97316,stroke:#c2410c,color:#1f2937
+    style R fill:#f97316,stroke:#c2410c,color:#1f2937
+    style G fill:#1e3a5f,stroke:#3b82f6,color:#dbeafe
+    style S fill:#334155,stroke:#64748b,color:#e2e8f0
+```
+
+O período é o **único** filtro enviado ao GLPI. Status e busca textual são
+aplicados sobre o resultado em memória — por isso refiltrar e exportar não
+repetem a varredura.
 
 ## Começando
 
