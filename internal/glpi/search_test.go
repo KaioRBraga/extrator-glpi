@@ -196,8 +196,14 @@ func TestBuscarChamados(t *testing.T) {
 	if fechado.MotivoEncerramento != "Ferramenta reinstalada" {
 		t.Errorf("motivo de encerramento = %q", fechado.MotivoEncerramento)
 	}
-	if fechado.DataAbertura != "27/06/2025 13:06" || fechado.DataSolucao != "02/07/2025 11:20" {
-		t.Errorf("datas = %q / %q", fechado.DataAbertura, fechado.DataSolucao)
+	if fechado.DataAbertura != "27/06/2025" || fechado.HoraAbertura != "13:06" {
+		t.Errorf("abertura = %q %q", fechado.DataAbertura, fechado.HoraAbertura)
+	}
+	if fechado.DataSolucao != "02/07/2025" || fechado.HoraSolucao != "11:20" {
+		t.Errorf("solucao = %q %q", fechado.DataSolucao, fechado.HoraSolucao)
+	}
+	if fechado.Atendimento != "118:14" {
+		t.Errorf("atendimento = %q, esperado 118:14", fechado.Atendimento)
 	}
 	// A busca devolve IDs; o cadastro de usuarios vira nome.
 	if fechado.Tecnico != "Tecnico Um | Tecnico Dois" {
@@ -221,8 +227,9 @@ func TestBuscarChamados(t *testing.T) {
 	if aberto.MotivoEncerramento != MotivoEmAberto {
 		t.Errorf("motivo de encerramento = %q, esperado %q", aberto.MotivoEncerramento, MotivoEmAberto)
 	}
-	if aberto.DataSolucao != "" {
-		t.Errorf("chamado em aberto com data de solucao %q", aberto.DataSolucao)
+	if aberto.DataSolucao != "" || aberto.HoraSolucao != "" || aberto.Atendimento != "" {
+		t.Errorf("chamado em aberto com solucao %q %q / atendimento %q",
+			aberto.DataSolucao, aberto.HoraSolucao, aberto.Atendimento)
 	}
 	if !aberto.AltaPrioridade {
 		t.Errorf("prioridade Alta deveria contar como alta prioridade")
@@ -325,4 +332,42 @@ func asErro(err error, alvo **Erro) bool {
 		*alvo = e
 	}
 	return ok
+}
+
+func TestFormatarAtendimento(t *testing.T) {
+	quando := func(s string) time.Time {
+		t.Helper()
+		v := parseData(s)
+		if v.IsZero() {
+			t.Fatalf("data de teste invalida: %q", s)
+		}
+		return v
+	}
+
+	casos := []struct {
+		nome     string
+		inicio   string
+		fim      string
+		esperado string
+	}{
+		{"mesmo dia", "2025-06-10 08:00:00", "2025-06-10 09:45:00", "01:45"},
+		{"minutos", "2025-06-10 08:00:00", "2025-06-10 08:07:00", "00:07"},
+		{"passa de 24h", "2025-06-10 08:00:00", "2025-06-11 09:30:00", "25:30"},
+		{"varios dias", "2025-06-27 13:06:00", "2025-07-02 11:20:00", "118:14"},
+		{"imediato", "2025-06-10 08:00:00", "2025-06-10 08:00:00", "00:00"},
+	}
+	for _, c := range casos {
+		if got := formatarAtendimento(quando(c.inicio), quando(c.fim)); got != c.esperado {
+			t.Errorf("%s: atendimento = %q, esperado %q", c.nome, got, c.esperado)
+		}
+	}
+
+	// Em aberto: sem fim, sem conta.
+	if got := formatarAtendimento(quando("2025-06-10 08:00:00"), time.Time{}); got != "" {
+		t.Errorf("sem data de solucao = %q, esperado vazio", got)
+	}
+	// Solucao anterior a abertura e dado inconsistente, nao atendimento negativo.
+	if got := formatarAtendimento(quando("2025-06-10 08:00:00"), quando("2025-06-09 08:00:00")); got != "" {
+		t.Errorf("solucao antes da abertura = %q, esperado vazio", got)
+	}
 }

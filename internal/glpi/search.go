@@ -495,7 +495,10 @@ func mapearChamado(item map[string]any, r Rotulos) Chamado {
 		Titulo:             titulo,
 		Status:             rotularStatus(statusBruto),
 		DataAbertura:       formatarData(abertura),
+		HoraAbertura:       formatarHora(abertura),
 		DataSolucao:        formatarData(dataFim),
+		HoraSolucao:        formatarHora(dataFim),
+		Atendimento:        formatarAtendimento(abertura, dataFim),
 		MotivoAbertura:     motivo,
 		OrigemMotivo:       origem,
 		MotivoEncerramento: encerramento,
@@ -834,7 +837,30 @@ func formatarData(t time.Time) string {
 	if t.IsZero() {
 		return ""
 	}
-	return t.Format("02/01/2006 15:04")
+	return t.Format("02/01/2006")
+}
+
+func formatarHora(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.Format("15:04")
+}
+
+// formatarAtendimento devolve o tempo decorrido entre a abertura e a solucao
+// como HH:MM, sem virar dia: um chamado de tres dias sai como "72:15". E o
+// formato que o Excel soma e faz media com a mascara [h]:mm.
+//
+// Vazio quando o chamado nao foi resolvido -- assim media e soma na planilha
+// nao misturam quem terminou com quem ainda esta em aberto. Vazio tambem
+// quando a solucao e anterior a abertura, que e dado inconsistente no GLPI e
+// nao um atendimento negativo.
+func formatarAtendimento(abertura, fim time.Time) string {
+	if abertura.IsZero() || fim.IsZero() || fim.Before(abertura) {
+		return ""
+	}
+	d := fim.Sub(abertura)
+	return fmt.Sprintf("%02d:%02d", int(d/time.Hour), int(d/time.Minute)%60)
 }
 
 var rotulosResolvido = map[string]bool{

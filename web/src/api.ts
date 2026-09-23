@@ -3,7 +3,10 @@ export type Chamado = {
   titulo: string;
   status: string;
   data_abertura: string;
+  hora_abertura: string;
   data_solucao: string;
+  hora_solucao: string;
+  atendimento: string;
   motivo_abertura: string;
   origem_motivo: string;
   motivo_encerramento: string;

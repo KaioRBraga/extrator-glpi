@@ -192,10 +192,20 @@ UTF-8 com BOM e separador `;` — o Excel em pt-BR abre direto. Valores que
 começam com `=`, `+`, `-` ou `@` são neutralizados contra injeção de fórmula.
 
 ```
-ID; Título; Status; Data de abertura; Data de solução; Motivo de abertura;
-Origem do motivo; Motivo de encerramento; Origem do encerramento;
-Usuário de rede; Requerente; Técnico; Categoria; Prioridade; Entidade
+ID; Título; Status; Data de abertura; Hora de abertura; Data de solução;
+Hora de solução; Atendimento; Motivo de abertura; Origem do motivo;
+Motivo de encerramento; Origem do encerramento; Usuário de rede;
+Requerente; Técnico; Categoria; Prioridade; Entidade
 ```
+
+Data e hora vão em células separadas: assim a planilha agrupa por dia sem
+precisar de fórmula, e a hora fica livre para virar faixa de horário.
+
+**Atendimento** é o tempo entre a abertura e a solução, em `HH:MM` — e o total
+não vira dia: um chamado de três dias sai como `72:15`, não `00:15`. É o
+formato que o Excel soma e faz média com a máscara `[h]:mm`. Chamado em aberto
+fica com a célula **vazia**, de propósito: um zero entraria na média como se o
+atendimento tivesse sido instantâneo.
 
 ## API
 

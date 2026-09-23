@@ -183,17 +183,45 @@ func TestExportarCSV(t *testing.T) {
 	if len(linhas) != 3 {
 		t.Fatalf("esperava cabecalho + 2 linhas, veio %d", len(linhas))
 	}
-	if linhas[0][0] != "ID" || linhas[0][5] != "Motivo de abertura" || linhas[0][7] != "Motivo de encerramento" {
+	// Colunas por nome: a ordem do cabecalho pode mudar sem quebrar o teste.
+	col := func(nome string) int {
+		for i, c := range linhas[0] {
+			if c == nome {
+				return i
+			}
+		}
+		t.Fatalf("coluna %q ausente no cabecalho %v", nome, linhas[0])
+		return -1
+	}
+	celula := func(linha int, coluna string) string { return linhas[linha][col(coluna)] }
+
+	if linhas[0][0] != "ID" {
 		t.Errorf("cabecalho = %v", linhas[0])
 	}
-	if linhas[1][5] != "ERRO NA FERRAMENTA" || linhas[1][7] != "Reinstalado" || linhas[1][8] != glpi.OrigemSolucao {
+	if celula(1, "Motivo de abertura") != "ERRO NA FERRAMENTA" ||
+		celula(1, "Motivo de encerramento") != "Reinstalado" ||
+		celula(1, "Origem do encerramento") != glpi.OrigemSolucao {
 		t.Errorf("linha do chamado fechado = %v", linhas[1])
 	}
-	if linhas[1][3] != "10/06/2025 08:00" || linhas[1][4] != "11/06/2025 09:30" {
-		t.Errorf("datas = %v", linhas[1][3:5])
+	// Data e hora em celulas separadas, para a planilha poder agrupar por dia.
+	if celula(1, "Data de abertura") != "10/06/2025" || celula(1, "Hora de abertura") != "08:00" {
+		t.Errorf("abertura = %q %q", celula(1, "Data de abertura"), celula(1, "Hora de abertura"))
 	}
-	if linhas[2][7] != glpi.MotivoEmAberto || linhas[2][8] != glpi.OrigemEmAberto {
-		t.Errorf("chamado em aberto = %q / %q", linhas[2][7], linhas[2][8])
+	if celula(1, "Data de solução") != "11/06/2025" || celula(1, "Hora de solução") != "09:30" {
+		t.Errorf("solucao = %q %q", celula(1, "Data de solução"), celula(1, "Hora de solução"))
+	}
+	// 10/06 08:00 -> 11/06 09:30 = 25h30: o total passa de um dia e nao zera.
+	if celula(1, "Atendimento") != "25:30" {
+		t.Errorf("atendimento = %q, esperado 25:30", celula(1, "Atendimento"))
+	}
+	if celula(2, "Motivo de encerramento") != glpi.MotivoEmAberto ||
+		celula(2, "Origem do encerramento") != glpi.OrigemEmAberto {
+		t.Errorf("chamado em aberto = %v", linhas[2])
+	}
+	// Em aberto nao tem atendimento: celula vazia nao entra em media na planilha.
+	if celula(2, "Hora de solução") != "" || celula(2, "Atendimento") != "" {
+		t.Errorf("chamado em aberto com hora/atendimento: %q / %q",
+			celula(2, "Hora de solução"), celula(2, "Atendimento"))
 	}
 }
 

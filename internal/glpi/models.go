@@ -11,8 +11,11 @@ type Chamado struct {
 	ID                 string `json:"id"`
 	Titulo             string `json:"titulo"`
 	Status             string `json:"status"`
-	DataAbertura       string `json:"data_abertura"`       // DD/MM/AAAA HH:MM
+	DataAbertura       string `json:"data_abertura"`       // DD/MM/AAAA
+	HoraAbertura       string `json:"hora_abertura"`       // HH:MM
 	DataSolucao        string `json:"data_solucao"`        // vazio se em aberto
+	HoraSolucao        string `json:"hora_solucao"`        // vazio se em aberto
+	Atendimento        string `json:"atendimento"`         // HH:MM entre abertura e solucao
 	MotivoAbertura     string `json:"motivo_abertura"`     //
 	OrigemMotivo       string `json:"origem_motivo"`       // formulario | categoria | titulo
 	MotivoEncerramento string `json:"motivo_encerramento"` // "Chamado em aberto" se nao resolvido

@@ -14,6 +14,7 @@ const colunas = [
   "Status",
   "Abertura",
   "Solução",
+  "Atendimento",
   "Motivo de abertura",
   "Motivo de encerramento",
   "Usuário de rede",
@@ -42,7 +43,7 @@ export default function TabelaChamados({
   return (
     <section className="mt-6">
       <div className="overflow-x-auto rounded-lg border border-borda bg-painel shadow-lg">
-        <table className="w-full min-w-[68rem] border-collapse text-left text-sm">
+        <table className="w-full min-w-[74rem] border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-borda bg-black/20">
               {colunas.map((c) => (
@@ -80,8 +81,24 @@ export default function TabelaChamados({
                 <td className="px-3 py-2">
                   <Etiqueta chamado={c} />
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap text-gray-300">{c.data_abertura}</td>
-                <td className="px-3 py-2 whitespace-nowrap text-gray-300">{c.data_solucao || "—"}</td>
+                <td className="px-3 py-2 whitespace-nowrap text-gray-300">
+                  {c.data_abertura}
+                  <span className="ml-1.5 text-xs text-gray-500">{c.hora_abertura}</span>
+                </td>
+                <td className="px-3 py-2 whitespace-nowrap text-gray-300">
+                  {c.data_solucao ? (
+                    <>
+                      {c.data_solucao}
+                      <span className="ml-1.5 text-xs text-gray-500">{c.hora_solucao}</span>
+                    </>
+                  ) : (
+                    "—"
+                  )}
+                </td>
+                {/* Tempo entre abertura e solucao, em HH:MM podendo passar de 24h. */}
+                <td className="px-3 py-2 font-mono text-xs whitespace-nowrap text-gray-300" title="Tempo entre a abertura e a solução">
+                  {c.atendimento || "—"}
+                </td>
                 <td className="max-w-[16rem] truncate px-3 py-2" title={`${c.motivo_abertura} (${c.origem_motivo})`}>
                   {c.motivo_abertura || "—"}
                 </td>
