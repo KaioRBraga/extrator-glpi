@@ -202,8 +202,8 @@ func TestBuscarChamados(t *testing.T) {
 	if fechado.DataSolucao != "02/07/2025" || fechado.HoraSolucao != "11:20" {
 		t.Errorf("solucao = %q %q", fechado.DataSolucao, fechado.HoraSolucao)
 	}
-	if fechado.Atendimento != "118:14" {
-		t.Errorf("atendimento = %q, esperado 118:14", fechado.Atendimento)
+	if fechado.Atendimento != "118:14:00" {
+		t.Errorf("atendimento = %q, esperado 118:14:00", fechado.Atendimento)
 	}
 	// A busca devolve IDs; o cadastro de usuarios vira nome.
 	if fechado.Tecnico != "Tecnico Um | Tecnico Dois" {
@@ -350,11 +350,14 @@ func TestFormatarAtendimento(t *testing.T) {
 		fim      string
 		esperado string
 	}{
-		{"mesmo dia", "2025-06-10 08:00:00", "2025-06-10 09:45:00", "01:45"},
-		{"minutos", "2025-06-10 08:00:00", "2025-06-10 08:07:00", "00:07"},
-		{"passa de 24h", "2025-06-10 08:00:00", "2025-06-11 09:30:00", "25:30"},
-		{"varios dias", "2025-06-27 13:06:00", "2025-07-02 11:20:00", "118:14"},
-		{"imediato", "2025-06-10 08:00:00", "2025-06-10 08:00:00", "00:00"},
+		{"mesmo dia", "2025-06-10 08:00:00", "2025-06-10 09:45:00", "01:45:00"},
+		{"minutos", "2025-06-10 08:00:00", "2025-06-10 08:07:00", "00:07:00"},
+		{"segundos", "2025-06-10 08:00:00", "2025-06-10 08:00:42", "00:00:42"},
+		{"os tres campos", "2025-06-10 08:00:10", "2025-06-10 09:45:55", "01:45:45"},
+		{"vira o minuto", "2025-06-10 08:00:50", "2025-06-10 08:01:10", "00:00:20"},
+		{"passa de 24h", "2025-06-10 08:00:00", "2025-06-11 09:30:00", "25:30:00"},
+		{"varios dias", "2025-06-27 13:06:00", "2025-07-02 11:20:00", "118:14:00"},
+		{"imediato", "2025-06-10 08:00:00", "2025-06-10 08:00:00", "00:00:00"},
 	}
 	for _, c := range casos {
 		if got := formatarAtendimento(quando(c.inicio), quando(c.fim)); got != c.esperado {

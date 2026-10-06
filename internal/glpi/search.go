@@ -848,8 +848,8 @@ func formatarHora(t time.Time) string {
 }
 
 // formatarAtendimento devolve o tempo decorrido entre a abertura e a solucao
-// como HH:MM, sem virar dia: um chamado de tres dias sai como "72:15". E o
-// formato que o Excel soma e faz media com a mascara [h]:mm.
+// como HH:MM:SS, sem virar dia: um chamado de tres dias sai como "72:15:08".
+// E o formato que o Excel soma e faz media com a mascara [h]:mm:ss.
 //
 // Vazio quando o chamado nao foi resolvido -- assim media e soma na planilha
 // nao misturam quem terminou com quem ainda esta em aberto. Vazio tambem
@@ -860,7 +860,8 @@ func formatarAtendimento(abertura, fim time.Time) string {
 		return ""
 	}
 	d := fim.Sub(abertura)
-	return fmt.Sprintf("%02d:%02d", int(d/time.Hour), int(d/time.Minute)%60)
+	return fmt.Sprintf("%02d:%02d:%02d",
+		int(d/time.Hour), int(d/time.Minute)%60, int(d/time.Second)%60)
 }
 
 var rotulosResolvido = map[string]bool{

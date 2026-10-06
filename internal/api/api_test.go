@@ -211,8 +211,8 @@ func TestExportarCSV(t *testing.T) {
 		t.Errorf("solucao = %q %q", celula(1, "Data de solução"), celula(1, "Hora de solução"))
 	}
 	// 10/06 08:00 -> 11/06 09:30 = 25h30: o total passa de um dia e nao zera.
-	if celula(1, "Atendimento") != "25:30" {
-		t.Errorf("atendimento = %q, esperado 25:30", celula(1, "Atendimento"))
+	if celula(1, "Atendimento") != "25:30:00" {
+		t.Errorf("atendimento = %q, esperado 25:30:00", celula(1, "Atendimento"))
 	}
 	if celula(2, "Motivo de encerramento") != glpi.MotivoEmAberto ||
 		celula(2, "Origem do encerramento") != glpi.OrigemEmAberto {

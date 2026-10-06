@@ -200,11 +200,15 @@ Requerente; Técnico; Categoria; Prioridade; Entidade
 Data e hora vão em células separadas: assim a planilha agrupa por dia sem
 precisar de fórmula, e a hora fica livre para virar faixa de horário.
 
-**Atendimento** é o tempo entre a abertura e a solução, em `HH:MM` — e o total
-não vira dia: um chamado de três dias sai como `72:15`, não `00:15`. É o
-formato que o Excel soma e faz média com a máscara `[h]:mm`. Chamado em aberto
-fica com a célula **vazia**, de propósito: um zero entraria na média como se o
-atendimento tivesse sido instantâneo.
+**Atendimento** é o tempo entre a abertura e a solução, em `HH:MM:SS` — e o
+total não vira dia: um chamado de três dias sai como `72:15:08`, não `00:15:08`.
+É o formato que o Excel soma e faz média com a máscara `[h]:mm:ss`. Chamado em
+aberto fica com a célula **vazia**, de propósito: um zero entraria na média como
+se o atendimento tivesse sido instantâneo.
+
+As colunas de hora saem em `HH:MM`, sem os segundos; o atendimento é calculado
+sobre o horário cheio do GLPI, então pode diferir em até um minuto da subtração
+feita a olho entre as duas células.
 
 ## API
 
